@@ -76,6 +76,7 @@
   var magicZoom = function() {
     var zoom;
     var mainFontSize = getMainFontSize();
+    console.log(mainFontSize);
     if (mainFontSize != -1) {
       zoom = PREFERRED_FONT_SIZE / getMainFontSize();
       document.body.style.zoom = zoom;
