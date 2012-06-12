@@ -1,6 +1,6 @@
 (function() {
-  var MAGIC_TEXT_LENGTH = 30;
-  var PREFERRED_FONT_SIZE = 18;
+  const MAGIC_TEXT_LENGTH = 30;
+  const PREFERRED_FONT_SIZE = 18;
 
   // get text length of imediate child text
   var getElemTextLength = function(elem) {
@@ -25,44 +25,46 @@
     }
   };
 
-  var getMainFontSize = function() {
-    //var paragraphs = document.getElementsByTagName("p");
-    var elems = document.querySelectorAll("p, span");
+  var getMainFontSize = function(nodeList) {
     var fontSizes = new Array();
     var maxCount = 0, mainFontSize = -1;
-    for (var i = 0; i < elems.length; i++) {
-      var elem = elems[i];
+    for (var i = 0; i < nodeList.length; i++) {
+      var elem = nodeList[i];
       if (getElemTextLength(elem) > MAGIC_TEXT_LENGTH) {
         var fontSize = getElemFontSize(elem);
         if (fontSizes[fontSize]) {
           fontSizes[fontSize]++;
-          console.log("----");
-          console.log(fontSize);
-          console.log(fontSizes[fontSize]);
-          console.log(maxCount);
-          console.log(elem);
-          console.log("----");
-          if (fontSizes[fontSize] > maxCount) {
-            maxCount = fontSizes[fontSize];
-            mainFontSize = fontSize;
-            console.log(mainFontSize);
-          }
         } else {
           fontSizes[fontSize] = 1;
+        }
+        
+        if (fontSizes[fontSize] > maxCount) {
+          maxCount = fontSizes[fontSize];
+          mainFontSize = fontSize;
         }
       }
     }
     return parseFloat(mainFontSize);
   };
+  
+  var processDoc = function(doc) {
+    var mainFontSize = getMainFontSize(doc.querySelectorAll("p, span, pre"));
+    console.log(mainFontSize);
+    if (mainFontSize != -1) {
+      var zoom = PREFERRED_FONT_SIZE / mainFontSize;
+      doc.body.style.zoom = zoom;
+    }
+  }
 
   // commit the zoom
   var magicZoom = function() {
-    var zoom;
-    var mainFontSize = getMainFontSize();
-    console.log(mainFontSize);
-    if (mainFontSize != -1) {
-      zoom = PREFERRED_FONT_SIZE / getMainFontSize();
-      document.body.style.zoom = zoom;
+    // document
+    processDoc(document);
+    
+    // iframes
+    var iframes = document.querySelectorAll("iframe");
+    for (var i = 0; i < iframes.length; i++) {
+      processDoc(iframes[i].contentDocument);
     }
   };
 
